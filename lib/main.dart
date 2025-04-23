@@ -1,12 +1,14 @@
+import 'package:chat_app/Cubit/login_cubit.dart';
 import 'package:chat_app/screens/ChatPage.dart';
 import 'package:chat_app/screens/RegisterPage.dart';
 import 'package:chat_app/screens/sign_in_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'firebase_options.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -20,14 +22,17 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      routes: {
-        SignInPage.id :(context)=>SignInPage(),
-        Registerpage.id:(context)=>Registerpage(),
-        Chatpage.id:(context)=>Chatpage(),
+    return BlocProvider(
+      create: (context) => LoginCubit(),
+      child: MaterialApp(
+        routes: {
+          SignInPage.id: (context) => SignInPage(),
+          Registerpage.id: (context) => Registerpage(),
+          Chatpage.id: (context) => Chatpage(),
 
-      },
-      initialRoute:SignInPage.id ,
+        },
+        initialRoute: SignInPage.id,
+      ),
     );
   }
 }
