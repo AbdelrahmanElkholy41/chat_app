@@ -1,22 +1,19 @@
+import 'package:chat_app/Cubit/register_cubit.dart';
 import 'package:chat_app/screens/ChatPage.dart';
 import 'package:chat_app/screens/sign_in_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 import '../component/CustomButton.dart';
 import '../component/customTextField.dart';
 import '../constants.dart';
 
-class Registerpage extends StatefulWidget {
+class Registerpage extends StatelessWidget {
    Registerpage({super.key});
   static String id = 'register';
-
-  @override
-  State<Registerpage> createState() => _RegisterpageState();
-}
-
-class _RegisterpageState extends State<Registerpage> {
+  
   String? Email;
 
   String? password;
@@ -27,6 +24,23 @@ bool isLoading=false;
 
   @override
   Widget build(BuildContext context) {
+    return BlocConsumer<RegisterCubit, RegisterState>(
+  listener: (context, state) {
+   if(state is RegisterLoading){
+     isLoading =true;
+   }
+   else if(state is RegisterSuccess){
+     isLoading=false;
+     Navigator.pushNamed(context, Chatpage.id);
+
+   }
+   else if(state is RegisterFailure){
+     showSnackBar(context,state.errMessage);
+     isLoading=false;
+
+   }
+  },
+  builder: (context, state) {
     return ModalProgressHUD(
       inAsyncCall: isLoading,
       child: Scaffold(
@@ -91,29 +105,7 @@ bool isLoading=false;
                             action: 'Register',
                             onTap: () async {
                               if (formKey.currentState!.validate()) {
-                                isLoading=true;
-                                setState(() {
-
-                                });
-                                try {
-                                  await registerUser();
-
-                                  Navigator.pushNamed(context,Chatpage.id);
-                                }
-                                on FirebaseAuthException catch (e) {
-                                  if (e.code == 'weak-password') {
-                                    showSnackBar(context, 'weak-password');
-                                  } else if (e.code == 'email-already-in-use') {
-                                    showSnackBar(context, 'email already exit');
-                                  }
-                                } catch (e) {
-                                  showSnackBar(context, 'there was an error');
-                                }
-                                isLoading=false;
-                                setState(() {
-
-                                });
-
+                                BlocProvider.of<RegisterCubit>(context).register(Email: Email, password: password);
                               }
                             }
                           ),
@@ -143,15 +135,13 @@ bool isLoading=false;
                         ]),
                   )))),
     );
+  },
+);
   }
 
   void showSnackBar(BuildContext context,String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  Future<void>registerUser()async{
-    UserCredential user = await FirebaseAuth.instance
-        .createUserWithEmailAndPassword
-      (email: Email!, password: password!);
-  }
+ 
 }

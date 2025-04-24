@@ -24,21 +24,21 @@ class SignInPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LoginCubit,LoginState>(
-      listener: (context, state) {
-        if(state is LoginLoading){
-
-          isLoading=true;
-        }
-        else if(state is LoginSuccess){
-          Navigator.pushNamed(context, Chatpage.id);
-
-        }else if(state is LoginFailuer){
-
-        }
-
-      },
-      child: ModalProgressHUD(
+    return BlocConsumer<LoginCubit,LoginState>(
+      listener: (context, state)
+    {
+      if (state is LoginLoading) {
+        isLoading = true;
+      }
+      else if (state is LoginSuccess) {
+        Navigator.pushNamed(context, Chatpage.id);
+        isLoading=false;
+      } else if (state is LoginFailuer) {
+        ScaffoldMessage(context, state.errMessage);
+        isLoading=false;
+      }
+    },
+      builder:(context,state)=> ModalProgressHUD(
         inAsyncCall: isLoading,
         child: Scaffold(
 
@@ -104,7 +104,7 @@ class SignInPage extends StatelessWidget {
 
 
                                 }else{
-                                  ScaffoldMessage(context,'TeFailed to login please try again');
+                                  ScaffoldMessage(context,'Failed to login please try again');
                                 }
                               }
                               ,),
