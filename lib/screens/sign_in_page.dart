@@ -1,3 +1,4 @@
+import 'package:chat_app/Cubit/chat_cubit.dart';
 import 'package:chat_app/Cubit/login_cubit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +32,12 @@ class SignInPage extends StatelessWidget {
         isLoading = true;
       }
       else if (state is LoginSuccess) {
+       BlocProvider.of<ChatCubit>(context).getMessage();
         Navigator.pushNamed(context, Chatpage.id);
         isLoading=false;
+
+
+
       } else if (state is LoginFailuer) {
         ScaffoldMessage(context, state.errMessage);
         isLoading=false;
